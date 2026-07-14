@@ -17,3 +17,9 @@ variable "monthly_budget_usd" {
   type        = number
   default     = 5
 }
+
+variable "project_prefix" {
+  description = "Prefix used to name project resources (kept short, lowercase)."
+  type        = string
+  default     = "pharma-de"
+}
