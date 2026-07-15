@@ -26,6 +26,11 @@ output "glue_raw_database" {
   value       = aws_glue_catalog_database.raw.name
 }
 
+output "glue_processed_database" {
+  description = "Glue catalog database holding the curated/processed tables."
+  value       = aws_glue_catalog_database.processed.name
+}
+
 output "glue_raw_crawler" {
   description = "Name of the Glue crawler over the raw zone."
   value       = aws_glue_crawler.raw.name
