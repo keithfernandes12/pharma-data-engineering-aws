@@ -2,7 +2,7 @@ resource "aws_athena_workgroup" "main" {
   name = "${var.project_prefix}-wg"
 
   configuration {
-    enforce_workgroup_configuration    = true
+    enforce_workgroup_configuration    = false
     publish_cloudwatch_metrics_enabled = false
 
     result_configuration {

@@ -39,6 +39,10 @@ resource "aws_glue_catalog_database" "raw" {
   name = "${replace(var.project_prefix, "-", "_")}_raw"
 }
 
+resource "aws_glue_catalog_database" "processed" {
+  name = "${replace(var.project_prefix, "-", "_")}_processed"
+}
+
 resource "aws_glue_crawler" "raw" {
   name          = "${var.project_prefix}-raw-crawler"
   role          = aws_iam_role.glue_crawler.arn
