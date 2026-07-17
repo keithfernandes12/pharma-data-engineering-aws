@@ -6,8 +6,9 @@ pharma data (2010–2026). Raw CSVs land in **Amazon S3**, are cataloged with
 heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 **Power BI** dashboard of findings.
 
-> 🚧 **Work in progress.** Storage + catalog + SQL query layer are live; ETL,
-> orchestration, and the dashboard are next. See progress below.
+> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, and a
+> Glue PySpark ETL job are live; orchestration and the dashboard are next. See
+> progress below.
 
 ## Architecture
 
@@ -32,13 +33,20 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 | M0 | Toolchain (AWS CLI + Terraform) & a Terraform-managed cost budget | ✅ Done |
 | M1 | S3 data lake (raw/processed zones, public-access blocked, versioning) | ✅ Done |
 | M2 | Glue database + crawler & Athena workgroup; raw data queryable via SQL | ✅ Done |
-| M3 | SQL layer — company & therapy-area crosswalks, dim/fact/analytics tables | ⏳ Next |
-| M4 | Glue PySpark ETL → curated Parquet in `processed/` | ⬜ Planned |
-| M5 | Orchestration (Lambda + EventBridge) | ⬜ Planned |
+| M3 | SQL layer — company & therapy-area crosswalks, dim/fact/analytics tables | ✅ Done |
+| M4 | Glue PySpark ETL showcase (company resolution + co-developer fan-out) | ✅ Done |
+| M5 | Orchestration (Lambda + EventBridge) | ⏳ Next |
 | M6 | Power BI dashboard (4 analytics themes) | ⬜ Planned |
 
-**Verified so far:** the crawler registers all 5 source tables and Athena row
-counts match the source files exactly (489 / 722 / 599 / 3310 / 1208).
+**Verified so far:**
+
+- Crawler registers all 5 source tables; Athena counts match the source files
+  exactly (489 / 722 / 599 / 3310 / 1208).
+- Star schema built via Athena SQL: 4 dimensions + 5 facts. Grain checks pass —
+  `fact_drug_approvals` is 732 rows for 722 approvals (intentional co-developer
+  fan-out from the company crosswalk); other facts stay 1:1.
+- The Glue PySpark job reproduces the approvals fact and matches the SQL table
+  row-for-row (`EXCEPT` both directions = 0).
 
 ## Data
 
@@ -49,18 +57,21 @@ Source: [Global Healthcare & Pharma 2010–2026](https://www.kaggle.com/datasets
 The files don't join cleanly — company names differ across files
 (`Bristol-Myers Squibb` vs `BMS`, partnered sponsors like `Pfizer/BioNTech`) and
 disease burden keys on disease while trials/approvals key on therapy area. The
-**SQL centerpiece (M3)** is building crosswalk tables to resolve these, then
-joining across all five files into analytics tables.
+**SQL centerpiece** resolves these with two crosswalk tables (company-name
+normalization + a therapy-area↔disease map), then joins across all five files
+into a star schema and per-theme analytics tables.
 
 ## Stack
 
-`Amazon S3` · `AWS Glue` · `Amazon Athena` · `Terraform` · `Power BI`
+`Amazon S3` · `AWS Glue (crawler + PySpark)` · `Amazon Athena` · `Terraform` · `Power BI`
 
 ## Repository layout
 
 ```text
 data/          raw source CSVs
 infra/         Terraform (S3, Glue, Athena, IAM, budget) — the whole stack as code
+sql/           Athena SQL — crosswalks, dims, facts, analytics, checks (numbered by run order)
+glue/          PySpark ETL script(s) for AWS Glue jobs
 README.md
 ```
 
