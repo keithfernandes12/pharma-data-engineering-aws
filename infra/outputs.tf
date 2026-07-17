@@ -40,3 +40,8 @@ output "athena_workgroup" {
   description = "Athena workgroup for running queries."
   value       = aws_athena_workgroup.main.name
 }
+
+output "glue_spark_job" {
+  description = "Name of the showcase Glue PySpark ETL job."
+  value       = aws_glue_job.approvals_spark.name
+}
