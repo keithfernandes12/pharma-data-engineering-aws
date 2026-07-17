@@ -20,7 +20,7 @@ resource "aws_iam_role_policy_attachment" "glue_service" {
 
 data "aws_iam_policy_document" "glue_s3_access" {
   statement {
-    actions = ["s3:GetObject", "s3:PutObject"]
+    actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
     resources = ["${aws_s3_bucket.datalake.arn}/*"]
   }
   statement {

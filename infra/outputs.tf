@@ -45,3 +45,8 @@ output "glue_spark_job" {
   description = "Name of the showcase Glue PySpark ETL job."
   value       = aws_glue_job.approvals_spark.name
 }
+
+output "state_machine_arn" {
+  description = "ARN of the Step Functions pipeline state machine."
+  value       = aws_sfn_state_machine.pipeline.arn
+}

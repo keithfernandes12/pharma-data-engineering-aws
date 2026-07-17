@@ -6,9 +6,9 @@ pharma data (2010–2026). Raw CSVs land in **Amazon S3**, are cataloged with
 heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 **Power BI** dashboard of findings.
 
-> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, and a
-> Glue PySpark ETL job are live; orchestration and the dashboard are next. See
-> progress below.
+> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, a Glue
+> PySpark ETL job, and Step Functions orchestration are live; the dashboard is
+> next. See progress below.
 
 ## Architecture
 
@@ -23,7 +23,7 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
                                                      │
                                                      ▼
                                             Power BI dashboard
-   (all infrastructure defined in Terraform · Lambda+EventBridge orchestration)
+   (all infrastructure defined in Terraform · Step Functions orchestration)
 ```
 
 ## Progress
@@ -35,8 +35,8 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 | M2 | Glue database + crawler & Athena workgroup; raw data queryable via SQL | ✅ Done |
 | M3 | SQL layer — company & therapy-area crosswalks, dim/fact/analytics tables | ✅ Done |
 | M4 | Glue PySpark ETL showcase (company resolution + co-developer fan-out) | ✅ Done |
-| M5 | Orchestration (Lambda + EventBridge) | ⏳ Next |
-| M6 | Power BI dashboard (4 analytics themes) | ⬜ Planned |
+| M5 | Orchestration — Step Functions state machine (crawler → Glue job) | ✅ Done |
+| M6 | Power BI dashboard (4 analytics themes) | ⏳ Next |
 
 **Verified so far:**
 
@@ -47,6 +47,8 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
   fan-out from the company crosswalk); other facts stay 1:1.
 - The Glue PySpark job reproduces the approvals fact and matches the SQL table
   row-for-row (`EXCEPT` both directions = 0).
+- A Step Functions state machine runs the crawler (poll-until-ready) then the
+  Glue job end-to-end on one trigger (execution status: SUCCEEDED).
 
 ## Data
 
@@ -63,7 +65,7 @@ into a star schema and per-theme analytics tables.
 
 ## Stack
 
-`Amazon S3` · `AWS Glue (crawler + PySpark)` · `Amazon Athena` · `Terraform` · `Power BI`
+`Amazon S3` · `AWS Glue (crawler + PySpark)` · `Amazon Athena` · `AWS Step Functions` · `Terraform` · `Power BI`
 
 ## Repository layout
 
