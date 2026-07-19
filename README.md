@@ -6,9 +6,9 @@ pharma data (2010–2026). Raw CSVs land in **Amazon S3**, are cataloged with
 heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 **Power BI** dashboard of findings.
 
-> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, and a
-> Glue PySpark ETL job are live; orchestration and the dashboard are next. See
-> progress below.
+> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, a Glue
+> PySpark ETL job, and an incremental-ingestion pipeline (Apache Iceberg) are
+> live; the dashboard is next. See progress below.
 
 ## Architecture
 
@@ -23,7 +23,12 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
                                                      │
                                                      ▼
                                             Power BI dashboard
-   (all infrastructure defined in Terraform · Lambda+EventBridge orchestration)
+
+ Incremental loads:
+   new CSV ──▶ S3 landing/ ──▶ Glue PySpark job ──▶ Iceberg table (append + dedup)
+                                        └──▶ move file to S3 archive/
+
+   (all infrastructure defined in Terraform)
 ```
 
 ## Progress
@@ -35,8 +40,8 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 | M2 | Glue database + crawler & Athena workgroup; raw data queryable via SQL | ✅ Done |
 | M3 | SQL layer — company & therapy-area crosswalks, dim/fact/analytics tables | ✅ Done |
 | M4 | Glue PySpark ETL showcase (company resolution + co-developer fan-out) | ✅ Done |
-| M5 | Orchestration (Lambda + EventBridge) | ⏳ Next |
-| M6 | Power BI dashboard (4 analytics themes) | ⬜ Planned |
+| M5 | Incremental ingestion — landing → Apache Iceberg append → archive (Glue) | ✅ Done |
+| M6 | Power BI dashboard (4 analytics themes) | ⏳ Next |
 
 **Verified so far:**
 
@@ -47,6 +52,9 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
   fan-out from the company crosswalk); other facts stay 1:1.
 - The Glue PySpark job reproduces the approvals fact and matches the SQL table
   row-for-row (`EXCEPT` both directions = 0).
+- Incremental ingestion proven end-to-end: dropping a new CSV in `landing/`
+  appended 3 rows to the Iceberg approvals table (722 → 725), archived the file,
+  and re-running the same file did **not** double-count (dedup on `approval_id`).
 
 ## Data
 
@@ -63,15 +71,15 @@ into a star schema and per-theme analytics tables.
 
 ## Stack
 
-`Amazon S3` · `AWS Glue (crawler + PySpark)` · `Amazon Athena` · `Terraform` · `Power BI`
+`Amazon S3` · `AWS Glue (crawler + PySpark)` · `Amazon Athena` · `Apache Iceberg` · `Terraform` · `Power BI`
 
 ## Repository layout
 
 ```text
 data/          raw source CSVs
 infra/         Terraform (S3, Glue, Athena, IAM, budget) — the whole stack as code
-sql/           Athena SQL — crosswalks, dims, facts, analytics, checks (numbered by run order)
-glue/          PySpark ETL script(s) for AWS Glue jobs
+sql/           Athena SQL — crosswalks, dims, facts, analytics, checks, iceberg (numbered by run order)
+glue/          PySpark ETL scripts for AWS Glue jobs (showcase + incremental ingestion)
 README.md
 ```
 
