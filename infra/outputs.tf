@@ -45,3 +45,8 @@ output "glue_spark_job" {
   description = "Name of the showcase Glue PySpark ETL job."
   value       = aws_glue_job.approvals_spark.name
 }
+
+output "glue_incremental_job" {
+  description = "Name of the incremental-ingestion Glue job (landing -> Iceberg -> archive)."
+  value       = aws_glue_job.incremental_ingest.name
+}
