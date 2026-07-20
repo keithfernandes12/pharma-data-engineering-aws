@@ -12,10 +12,10 @@ Databases: `pharma_de_raw` (source tables) → `pharma_de_processed` (curated).
 
 | Folder | Prefix | Purpose |
 |--------|--------|---------|
-| `staging/`    | `0x` | Cleaned views/tables over the raw catalog (type casts, trims) |
 | `crosswalks/` | `1x` | Reference tables that resolve join problems (see below) |
 | `marts/`      | `2x`–`3x` | Dimensions (`2x`) and facts (`3x`) — the star schema |
 | `analytics/`  | `4x` | One query per dashboard question (feeds Power BI) |
+| `iceberg/`    | `5x` | Apache Iceberg table for incremental ingestion (create + seed) |
 | `checks/`     | —   | Representative verification queries (row counts, spot-checks) |
 
 Run files in ascending numeric order to rebuild the SQL layer from the raw
