@@ -2,13 +2,13 @@
 
 An end-to-end AWS data engineering project over 17 years of global healthcare and
 pharma data (2010–2026). Raw CSVs land in **Amazon S3**, are cataloged with
-**AWS Glue** and transformed with **SQL in Amazon Athena** (Glue PySpark for
-heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
-**Power BI** dashboard of findings.
+**AWS Glue** and modeled with **SQL in Amazon Athena**, with a **Glue PySpark**
+job handling incremental loads into **Apache Iceberg** — all provisioned as code
+with **Terraform**, and surfaced in a **Power BI** dashboard of findings.
 
-> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, a Glue
-> PySpark ETL job, and an incremental-ingestion pipeline (Apache Iceberg) are
-> live; the dashboard is next. See progress below.
+> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, and an
+> incremental-ingestion pipeline (Glue PySpark → Apache Iceberg) are live; the
+> dashboard is next. See progress below.
 
 ## Architecture
 
@@ -17,9 +17,10 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
                                                      │
                                                      ▼
                                             Amazon Athena (SQL)
-                                          crosswalks · dims · facts
-                                                     │
-                                     Glue PySpark ETL ──▶ S3 processed/ (Parquet)
+                                    crosswalks · dims · facts · analytics
+                                                     │ CTAS
+                                                     ▼
+                                            S3 processed/ (Parquet)
                                                      │
                                                      ▼
                                             Power BI dashboard
@@ -39,9 +40,8 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 | M1 | S3 data lake (raw/processed zones, public-access blocked, versioning) | ✅ Done |
 | M2 | Glue database + crawler & Athena workgroup; raw data queryable via SQL | ✅ Done |
 | M3 | SQL layer — company & therapy-area crosswalks, dim/fact/analytics tables | ✅ Done |
-| M4 | Glue PySpark ETL showcase (company resolution + co-developer fan-out) | ✅ Done |
-| M5 | Incremental ingestion — landing → Apache Iceberg append → archive (Glue) | ✅ Done |
-| M6 | Power BI dashboard (4 analytics themes) | ⏳ Next |
+| M4 | Incremental ingestion — Glue PySpark: landing → Apache Iceberg append → archive | ✅ Done |
+| M5 | Power BI dashboard (4 analytics themes) | ⏳ Next |
 
 **Verified so far:**
 
@@ -50,8 +50,6 @@ heavier ETL), all provisioned as code with **Terraform**, and surfaced in a
 - Star schema built via Athena SQL: 4 dimensions + 5 facts. Grain checks pass —
   `fact_drug_approvals` is 732 rows for 722 approvals (intentional co-developer
   fan-out from the company crosswalk); other facts stay 1:1.
-- The Glue PySpark job reproduces the approvals fact and matches the SQL table
-  row-for-row (`EXCEPT` both directions = 0).
 - Incremental ingestion proven end-to-end: dropping a new CSV in `landing/`
   appended 3 rows to the Iceberg approvals table (722 → 725), archived the file,
   and re-running the same file did **not** double-count (dedup on `approval_id`).
@@ -79,7 +77,7 @@ into a star schema and per-theme analytics tables.
 data/          raw source CSVs
 infra/         Terraform (S3, Glue, Athena, IAM, budget) — the whole stack as code
 sql/           Athena SQL — crosswalks, dims, facts, analytics, checks, iceberg (numbered by run order)
-glue/          PySpark ETL scripts for AWS Glue jobs (showcase + incremental ingestion)
+glue/          PySpark ETL script for the incremental-ingestion Glue job
 README.md
 ```
 
