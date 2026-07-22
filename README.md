@@ -67,6 +67,87 @@ disease burden keys on disease while trials/approvals key on therapy area. The
 normalization + a therapy-area↔disease map), then joins across all five files
 into a star schema and per-theme analytics tables.
 
+## Data model (ERD)
+
+The Power BI import model over `pharma_de_processed` — 4 dimensions and
+`fact_disease_burden` feed 4 per-theme analytics (`rpt_*`) tables. Relationships
+are single-direction 1 (dim) → * (fact/rpt), joined on text keys.
+
+```mermaid
+erDiagram
+    dim_company {
+        varchar company_name PK
+        varchar ticker
+        varchar country_iso3
+        varchar segment
+        boolean is_glp1_player
+        boolean is_covid_vaccine_player
+        boolean has_financials
+    }
+    dim_therapy_area {
+        varchar therapy_area PK
+        varchar therapy_area_label
+        varchar therapy_area_group
+    }
+    dim_disease {
+        varchar disease PK
+        varchar mapped_therapy_area FK
+        boolean has_therapy_area
+    }
+    dim_region {
+        varchar region PK
+        varchar income_tier
+        boolean is_developed
+    }
+
+    rpt_rnd_efficiency_by_company {
+        varchar company_name FK
+        varchar segment
+        double total_rnd_usd_bn
+        bigint approvals_count
+        double total_peak_sales_usd_bn
+        double peak_sales_per_rnd_usd
+    }
+    rpt_buy_vs_build {
+        varchar company_name FK
+        varchar segment
+        double total_ma_usd_bn
+        bigint ma_deal_count
+        double total_rnd_usd_bn
+        double ma_to_rnd_ratio
+    }
+    rpt_therapy_area_success_vs_value {
+        varchar therapy_area FK
+        bigint trials_count
+        double success_rate
+        bigint approvals_count
+        double avg_peak_sales_usd_bn
+    }
+    rpt_burden_vs_rnd_mismatch {
+        varchar therapy_area FK
+        double global_dalys_millions
+        bigint approvals_count
+        double total_peak_sales_usd_bn
+        double dalys_per_approval
+    }
+    fact_disease_burden {
+        bigint year
+        varchar region FK
+        varchar disease FK
+        varchar mapped_therapy_area
+        double dalys_millions
+        double global_dalys_millions
+    }
+
+    dim_company ||--o{ rpt_rnd_efficiency_by_company : "company_name"
+    dim_company ||--o{ rpt_buy_vs_build : "company_name"
+    dim_therapy_area ||--o{ rpt_therapy_area_success_vs_value : "therapy_area"
+    dim_therapy_area ||--o{ rpt_burden_vs_rnd_mismatch : "therapy_area"
+    dim_therapy_area ||--o{ dim_disease : "mapped_therapy_area"
+    dim_region ||--o{ fact_disease_burden : "region"
+    dim_disease ||--o{ fact_disease_burden : "disease"
+```
+
 ## Stack
 
 `Amazon S3` · `AWS Glue (crawler + PySpark)` · `Amazon Athena` · `Apache Iceberg` · `Terraform` · `Power BI`
