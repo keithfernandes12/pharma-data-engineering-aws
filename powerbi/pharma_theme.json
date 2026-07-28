@@ -1,0 +1,54 @@
+{
+  "name": "Pharma DE — Indigo (brand)",
+  "dataColors": [
+    "#100E6F",
+    "#E66C37",
+    "#744EC2",
+    "#3599B8",
+    "#E044A7",
+    "#D9B300",
+    "#4AC5BB",
+    "#D64550"
+  ],
+  "good": "#168980",
+  "neutral": "#D9B300",
+  "bad": "#D64550",
+  "maximum": "#100E6F",
+  "center": "#744EC2",
+  "minimum": "#CCD3EB",
+  "null": "#7F898A",
+  "background": "#F7F7FB",
+  "secondaryBackground": "#FFFFFF",
+  "foreground": "#252525",
+  "tableAccent": "#100E6F",
+  "textClasses": {
+    "title":   { "fontFace": "Segoe UI Semibold", "color": "#252525", "fontSize": 14 },
+    "label":   { "fontFace": "Segoe UI", "color": "#5F6B6D", "fontSize": 10 },
+    "callout": { "fontFace": "Segoe UI Semibold", "color": "#100E6F", "fontSize": 28 },
+    "header":  { "color": "#252525" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
+        "border": [{ "show": true, "color": { "solid": { "color": "#EAEAF2" } }, "radius": 16 }],
+        "dropShadow": [{ "show": true, "color": { "solid": { "color": "#100E6F" } }, "position": "Outer", "preset": "Custom", "shadowSpread": 3, "shadowBlur": 14, "transparency": 90, "angle": 90 }],
+        "visualHeader": [{ "show": false }],
+        "categoryAxis": [{ "gridlineShow": false, "labelColor": { "solid": { "color": "#5F6B6D" } }, "titleColor": { "solid": { "color": "#252525" } } }],
+        "valueAxis": [{ "gridlineColor": { "solid": { "color": "#EAEAF2" } }, "gridlineThickness": 1, "labelColor": { "solid": { "color": "#5F6B6D" } } }],
+        "title": [{ "show": true, "fontColor": { "solid": { "color": "#252525" } }, "fontSize": 14, "fontFamily": "Segoe UI Semibold", "alignment": "center" }]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [{ "color": { "solid": { "color": "#100E6F" } }, "fontSize": 28, "fontFamily": "Segoe UI Semibold" }],
+        "categoryLabels": [{ "color": { "solid": { "color": "#5F6B6D" } }, "fontSize": 10 }]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#F7F7FB" } }, "transparency": 0 }]
+      }
+    }
+  }
+}
