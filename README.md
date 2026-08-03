@@ -6,9 +6,9 @@ pharma data (2010–2026). Raw CSVs land in **Amazon S3**, are cataloged with
 job handling incremental loads into **Apache Iceberg** — all provisioned as code
 with **Terraform**, and surfaced in a **Power BI** dashboard of findings.
 
-> 🚧 **Work in progress.** Storage, catalog, the full SQL modeling layer, and an
-> incremental-ingestion pipeline (Glue PySpark → Apache Iceberg) are live; the
-> dashboard is next. See progress below.
+The full pipeline is built end-to-end: raw data → catalog → SQL star schema →
+incremental Iceberg ingestion → a 6-page Power BI report. See the
+[Dashboard](#dashboard) below.
 
 ## Architecture
 
@@ -41,7 +41,7 @@ with **Terraform**, and surfaced in a **Power BI** dashboard of findings.
 | M2 | Glue database + crawler & Athena workgroup; raw data queryable via SQL | ✅ Done |
 | M3 | SQL layer — company & therapy-area crosswalks, dim/fact/analytics tables | ✅ Done |
 | M4 | Incremental ingestion — Glue PySpark: landing → Apache Iceberg append → archive | ✅ Done |
-| M5 | Power BI dashboard (4 analytics themes) | ⏳ Next |
+| M5 | Power BI dashboard — 6 pages over the Athena model (ODBC) | ✅ Done |
 
 **Verified so far:**
 
@@ -53,6 +53,47 @@ with **Terraform**, and surfaced in a **Power BI** dashboard of findings.
 - Incremental ingestion proven end-to-end: dropping a new CSV in `landing/`
   appended 3 rows to the Iceberg approvals table (722 → 725), archived the file,
   and re-running the same file did **not** double-count (dedup on `approval_id`).
+
+## Dashboard
+
+A 6-page Power BI report connected live to Amazon Athena (ODBC), built on the
+star-schema model below. Navigate from the landing page into four analytical
+themes plus a company overview.
+
+**Landing page**
+
+![Home](docs/screenshots/00-home.jpg)
+
+**Overview — companies & financials**
+
+![Overview](docs/screenshots/01-overview.jpg)
+
+### The four analytical themes
+
+**Pipeline & Trials** — trial success rate vs commercial value by therapy area.
+Oncology runs the most trials but at the lowest success rate; high-success,
+high-value areas are the industry's sweet spot.
+
+![Pipeline & Trials](docs/screenshots/02-pipeline-trials.jpg)
+
+**Burden vs R&D** — where the drug pipeline doesn't match disease burden.
+Cardiovascular and psychiatric disease carry ~11× the DALYs-per-approval of
+oncology — i.e. heavy burden, comparatively few drugs (under-served).
+
+![Burden vs R&D](docs/screenshots/03-burden-vs-rnd.jpg)
+
+**R&D Efficiency** — which companies turn research spend into approved-drug value.
+Small biotechs (BioNTech, Regeneron, Vertex) lead on peak-sales-per-R&D-dollar.
+
+![R&D Efficiency](docs/screenshots/04-rnd-efficiency.jpg)
+
+**Buy vs Build** — M&A dealmaking vs internal R&D. Companies above the 1.0 line
+(Teva, BMS, AbbVie) grew more by acquiring than by building.
+
+![Buy vs Build](docs/screenshots/05-buy-vs-build.jpg)
+
+> The `.pbix` is in [`powerbi/`](powerbi/); it connects to Athena via ODBC in
+> import mode. Theme palette and the ERD source are in the same folder.
 
 ## Data
 
