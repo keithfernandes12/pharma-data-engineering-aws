@@ -1,0 +1,38 @@
+%% End-to-end architecture — pharma-data-engineering-aws
+%% Renders on GitHub. All AWS resources are provisioned by Terraform (infra/).
+
+flowchart LR
+    subgraph SRC[" Source "]
+        CSV["5 CSVs<br/>~6,300 rows<br/>(data/)"]
+        NEW["New CSV<br/>(incremental)"]
+    end
+
+    subgraph AWS[" AWS &nbsp;(us-east-1, Terraform-provisioned) "]
+        direction TB
+        subgraph LAKE[" Amazon S3 data lake "]
+            RAW["raw/"]
+            LAND["landing/"]
+            PROC["processed/<br/>(Parquet)"]
+            ICE["iceberg/<br/>approvals_iceberg"]
+            ARC["archive/"]
+        end
+        CRAWL["AWS Glue Crawler<br/>pharma-de-raw-crawler"]
+        CAT["Glue Data Catalog<br/>pharma_de_raw /<br/>pharma_de_processed"]
+        ATHENA["Amazon Athena<br/>workgroup pharma-de-wg<br/>crosswalks - dims - facts - rpt_"]
+        GLUE["Glue PySpark job<br/>pharma-de-incremental-ingest<br/>(append + dedup)"]
+    end
+
+    subgraph BI[" Analytics "]
+        PBI["Power BI Desktop<br/>ODBC import - 11-table model<br/>6-page report"]
+    end
+
+    CSV --> RAW
+    RAW --> CRAWL --> CAT
+    CAT --> ATHENA
+    ATHENA -- CTAS --> PROC
+    PROC --> PBI
+
+    NEW --> LAND
+    LAND --> GLUE
+    GLUE -- append + dedup on approval_id --> ICE
+    GLUE -- move processed file --> ARC

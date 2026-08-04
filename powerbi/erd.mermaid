@@ -1,8 +1,8 @@
-%% Power BI data model — ERD for the imported tables (pharma_de_processed):
-%%   4 dimensions + 4 analytics (rpt_*) + fact_disease_burden.
-%% Renders on GitHub. Also importable into Lucidchart:
-%%   Lucid → File → Import → Mermaid  (paste this file's contents).
-%% Relationships are 1 (dim) → * (fact/rpt), single-direction, joined on text keys.
+%% Power BI import model over pharma_de_processed (Amazon Athena, via ODBC).
+%% 4 dimensions + 3 raw facts + 4 pre-aggregated analytics (rpt_*) marts.
+%% Every relationship is Many-to-one (fact/rpt = *, dim = 1), single cross-filter
+%% direction, joined on text/integer keys. Renders on GitHub; also importable into
+%% Lucidchart via File -> Import -> Mermaid.
 
 erDiagram
     dim_company {
@@ -19,15 +19,40 @@ erDiagram
         varchar therapy_area_label
         varchar therapy_area_group
     }
-    dim_disease {
-        varchar disease PK
-        varchar mapped_therapy_area FK
-        boolean has_therapy_area
-    }
     dim_region {
         varchar region PK
         varchar income_tier
         boolean is_developed
+    }
+    dim_year {
+        bigint Year PK
+    }
+
+    fact_financials {
+        varchar company_name FK
+        bigint year FK
+        double revenue_usd_bn
+        double operating_margin_pct
+        double operating_income_usd_bn
+        double rd_spend_usd_bn
+        bigint pipeline_size_est
+    }
+    fact_biotech_funding {
+        bigint deal_id
+        bigint year FK
+        varchar acquirer_company FK
+        varchar target_name
+        varchar deal_type
+        double value_usd_bn
+        boolean is_megadeal
+    }
+    fact_disease_burden {
+        bigint year FK
+        varchar region FK
+        varchar disease
+        varchar mapped_therapy_area
+        double dalys_millions
+        double global_dalys_millions
     }
 
     rpt_rnd_efficiency_by_company {
@@ -60,19 +85,14 @@ erDiagram
         double total_peak_sales_usd_bn
         double dalys_per_approval
     }
-    fact_disease_burden {
-        bigint year
-        varchar region FK
-        varchar disease FK
-        varchar mapped_therapy_area
-        double dalys_millions
-        double global_dalys_millions
-    }
 
-    dim_company ||--o{ rpt_rnd_efficiency_by_company : "company_name"
-    dim_company ||--o{ rpt_buy_vs_build : "company_name"
+    dim_company      ||--o{ fact_financials                   : "company_name"
+    dim_company      ||--o{ fact_biotech_funding              : "acquirer"
+    dim_company      ||--o{ rpt_rnd_efficiency_by_company     : "company_name"
+    dim_company      ||--o{ rpt_buy_vs_build                  : "company_name"
     dim_therapy_area ||--o{ rpt_therapy_area_success_vs_value : "therapy_area"
-    dim_therapy_area ||--o{ rpt_burden_vs_rnd_mismatch : "therapy_area"
-    dim_therapy_area ||--o{ dim_disease : "mapped_therapy_area"
-    dim_region ||--o{ fact_disease_burden : "region"
-    dim_disease ||--o{ fact_disease_burden : "disease"
+    dim_therapy_area ||--o{ rpt_burden_vs_rnd_mismatch        : "therapy_area"
+    dim_region       ||--o{ fact_disease_burden               : "region"
+    dim_year         ||--o{ fact_financials                   : "year"
+    dim_year         ||--o{ fact_biotech_funding              : "year"
+    dim_year         ||--o{ fact_disease_burden               : "year"
