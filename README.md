@@ -52,9 +52,9 @@ building in-house.
 
 ![Buy vs Build](docs/screenshots/05-buy-vs-build.jpg)
 
-> Full report: the [`.pbix`](powerbi/PowerBI%20Dashboard/pharma-analytics-dashboard.pbix)
-> and a [PDF export](powerbi/PowerBI%20Dashboard/pharma-analytics-dashboard.pdf) are in
-> [`powerbi/`](powerbi/). It connects to Athena via ODBC in import mode.
+> Full report: the [`.pbix`](powerbi/pharma-analytics-dashboard.pbix) is in
+> [`powerbi/`](powerbi/) and a [PDF export](docs/pharma-analytics-dashboard.pdf)
+> is in [`docs/`](docs/). It connects to Athena via ODBC in import mode.
 
 ---
 
@@ -127,7 +127,7 @@ illustrative.*
 The Power BI import model over `pharma_de_processed`: 4 dimensions + 3 facts + 4
 pre-aggregated analytics (`rpt_*`) tables. Every relationship is single-direction,
 many-to-one (dimension → fact/analytics), joined on text/integer keys. ERD source:
-[`powerbi/erd.mermaid`](powerbi/erd.mermaid).
+[`docs/erd.mermaid`](docs/erd.mermaid).
 
 <details>
 <summary>Entity-relationship diagram (click to expand)</summary>
@@ -232,12 +232,12 @@ erDiagram
 ## Repository layout
 
 ```text
-data/          raw source CSVs
+data/          raw source CSVs (+ overview README)
 infra/         Terraform - the whole AWS stack as code (S3, Glue, Athena, IAM, budget)
 sql/           Athena SQL - crosswalks, dims, facts, analytics, checks, iceberg (numbered by run order)
 glue/          PySpark ETL script for the incremental-ingestion Glue job
-powerbi/       the Power BI report (.pbix), a PDF export, and the ERD source
-docs/          architecture diagram + dashboard screenshots
+powerbi/       the Power BI report (.pbix)
+docs/          ERD + architecture diagrams, PDF export, dashboard screenshots
 ```
 
 ## Running it yourself
