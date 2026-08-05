@@ -1,4 +1,4 @@
-# Global Pharma Intelligence: AWS Data Engineering Pipeline
+# **Global Pharma Intelligence:** AWS Data Engineering Pipeline
 
 **An end-to-end cloud data pipeline that turns five messy public datasets into a
 6-page business-intelligence dashboard**, built entirely on AWS and provisioned as
