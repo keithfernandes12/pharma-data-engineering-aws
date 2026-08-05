@@ -1,4 +1,4 @@
-# Global Pharma Intelligence: AWS Data Engineering Pipeline
+# **Global Pharma Intelligence:** AWS Data Engineering Pipeline
 
 **An end-to-end cloud data pipeline that turns five messy public datasets into a
 6-page business-intelligence dashboard**, built entirely on AWS and provisioned as
@@ -65,6 +65,11 @@ Amazon Athena**, and served to **Power BI**. A separate **Glue PySpark** job kee
 warehouse current by loading new files into an **Apache Iceberg** table. Every AWS
 resource is defined in **Terraform**.
 
+![Architecture](docs/architecture.png)
+
+<details>
+<summary>Text version (click to expand)</summary>
+
 ```text
  data/*.csv ──▶ S3 raw/ ──▶ Glue Crawler ──▶ Glue Data Catalog
                                                    │
@@ -80,7 +85,7 @@ resource is defined in **Terraform**.
                                         └──▶ move file to S3 archive/
 ```
 
-*(A GitHub-renderable version lives in [`docs/architecture.mermaid`](docs/architecture.mermaid).)*
+</details>
 
 ### The interesting engineering problem
 
