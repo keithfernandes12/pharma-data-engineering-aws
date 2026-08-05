@@ -1,6 +1,3 @@
-# Input variables. Values with no default are supplied at apply time (or via a
-# gitignored *.tfvars file) so nothing account-specific is committed.
-
 variable "aws_region" {
   description = "AWS region for all resources."
   type        = string

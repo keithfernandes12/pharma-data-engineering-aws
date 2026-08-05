@@ -1,5 +1,5 @@
 """
-Glue PySpark ETL — incremental ingestion of new drug-approval files.
+Glue PySpark ETL - incremental ingestion of new drug-approval files.
 
 Flow:
   1. Read any CSVs in  s3://<bucket>/landing/drug_approvals/
@@ -9,7 +9,7 @@ Flow:
      so it is never reprocessed.
 
 If landing/ is empty, the job exits cleanly (no-op). This is the "keep the
-warehouse up to date as new data arrives" pattern — the reason the pipeline is
+warehouse up to date as new data arrives" pattern - the reason the pipeline is
 orchestrated at all.
 
 Job parameters (Glue): --bucket
