@@ -65,6 +65,11 @@ Amazon Athena**, and served to **Power BI**. A separate **Glue PySpark** job kee
 warehouse current by loading new files into an **Apache Iceberg** table. Every AWS
 resource is defined in **Terraform**.
 
+![Architecture](docs/architecture.png)
+
+<details>
+<summary>Text version (click to expand)</summary>
+
 ```text
  data/*.csv ──▶ S3 raw/ ──▶ Glue Crawler ──▶ Glue Data Catalog
                                                    │
@@ -80,7 +85,7 @@ resource is defined in **Terraform**.
                                         └──▶ move file to S3 archive/
 ```
 
-*(A GitHub-renderable version lives in [`docs/architecture.mermaid`](docs/architecture.mermaid).)*
+</details>
 
 ### The interesting engineering problem
 
