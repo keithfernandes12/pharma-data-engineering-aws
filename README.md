@@ -126,8 +126,12 @@ illustrative.*
 
 The Power BI import model over `pharma_de_processed`: 4 dimensions + 3 facts + 4
 pre-aggregated analytics (`rpt_*`) tables. Every relationship is single-direction,
-many-to-one (dimension → fact/analytics), joined on text/integer keys. ERD source:
-[`docs/erd.mermaid`](docs/erd.mermaid).
+many-to-one (dimension → fact/analytics), joined on text/integer keys.
+
+![Semantic model](docs/semantic-model.png)
+
+> The Power BI Model view above. ERD source (GitHub-renderable):
+> [`docs/erd.mermaid`](docs/erd.mermaid), shown below.
 
 <details>
 <summary>Entity-relationship diagram (click to expand)</summary>
