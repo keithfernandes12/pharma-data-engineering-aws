@@ -87,7 +87,7 @@ erDiagram
     }
 
     dim_company      ||--o{ fact_financials                   : "company_name"
-    dim_company      ||--o{ fact_biotech_funding              : "acquirer"
+    dim_company      ||--o{ fact_biotech_funding              : "acquirer_company"
     dim_company      ||--o{ rpt_rnd_efficiency_by_company     : "company_name"
     dim_company      ||--o{ rpt_buy_vs_build                  : "company_name"
     dim_therapy_area ||--o{ rpt_therapy_area_success_vs_value : "therapy_area"

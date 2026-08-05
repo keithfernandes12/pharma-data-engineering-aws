@@ -1,6 +1,3 @@
-# Outputs — values Terraform prints after apply and that other tooling/milestones
-# can consume (e.g. `terraform output -raw datalake_bucket_name`).
-
 output "datalake_bucket_name" {
   description = "Name of the S3 data lake bucket."
   value       = aws_s3_bucket.datalake.bucket

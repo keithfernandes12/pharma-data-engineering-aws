@@ -1,6 +1,3 @@
-# Terraform + provider version pins. Keeping these explicit makes the project
-# reproducible: anyone running `terraform init` gets the same tooling.
-
 terraform {
   required_version = ">= 1.5"
 
